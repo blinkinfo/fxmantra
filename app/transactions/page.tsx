@@ -60,7 +60,7 @@ function TransactionsContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { authenticated, ready } = usePrivy();
+  const { authenticated, ready, user } = usePrivy();
 
   // Read filters from URL
   const activeType = searchParams.get("type") || null;
@@ -73,6 +73,7 @@ function TransactionsContent() {
   if (activeToken) queryParams.set("token", activeToken);
   queryParams.set("page", String(activePage));
   queryParams.set("limit", String(ITEMS_PER_PAGE));
+  if (user?.id) queryParams.set("privyId", user.id);
 
   const apiUrl = `/api/transactions?${queryParams.toString()}`;
 

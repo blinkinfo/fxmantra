@@ -41,7 +41,7 @@ type DepositStage =
 const APP_WALLET = process.env.NEXT_PUBLIC_APP_WALLET_ADDRESS as `0x${string}` | undefined;
 
 export default function DepositPage() {
-  const { authenticated, ready, login } = usePrivy();
+  const { authenticated, ready, user, login } = usePrivy();
   const { wallets } = useWallets();
   const wallet = wallets[0];
   const address = wallet?.address as `0x${string}` | undefined;
@@ -118,6 +118,7 @@ export default function DepositPage() {
           token,
           amount: parsedAmount,
           fromAddress: address,
+          privyId: user?.id,
         }),
       });
 

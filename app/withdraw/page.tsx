@@ -124,7 +124,7 @@ export default function WithdrawPage() {
   } = useQuery<BalanceData>({
     queryKey: ["balance"],
     queryFn: async () => {
-      const res = await fetch("/api/balance");
+      const res = await fetch(`/api/balance?privyId=${encodeURIComponent(user?.id!)}`);
       if (!res.ok) throw new Error("Failed to fetch balance");
       return res.json();
     },
@@ -136,7 +136,7 @@ export default function WithdrawPage() {
   const { data: withdrawals } = useQuery<TransactionData[]>({
     queryKey: ["transactions", "WITHDRAWAL"],
     queryFn: async () => {
-      const res = await fetch("/api/transactions?type=WITHDRAWAL&limit=10");
+      const res = await fetch(`/api/transactions?type=WITHDRAWAL&limit=10&privyId=${encodeURIComponent(user?.id!)}`);
       if (!res.ok) return [];
       return res.json();
     },
@@ -162,7 +162,7 @@ export default function WithdrawPage() {
       const res = await fetch("/api/withdraw", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: withdrawAmount, token: "USDC" }),
+        body: JSON.stringify({ amount: withdrawAmount, token: "USDC", privyId: user?.id }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Withdrawal failed");

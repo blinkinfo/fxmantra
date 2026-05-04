@@ -56,14 +56,14 @@ interface TransactionsResponse {
 }
 
 // ------------------------------------------------------------------ Fetch helpers
-async function fetchBalance(): Promise<BalanceData> {
-  const res = await fetch("/api/balance");
+async function fetchBalance(privyId: string): Promise<BalanceData> {
+  const res = await fetch(`/api/balance?privyId=${encodeURIComponent(privyId)}`);
   if (!res.ok) throw new Error("Failed to fetch balance");
   return res.json();
 }
 
-async function fetchRecentTransactions(): Promise<Transaction[]> {
-  const res = await fetch("/api/transactions?limit=5");
+async function fetchRecentTransactions(privyId: string): Promise<Transaction[]> {
+  const res = await fetch(`/api/transactions?privyId=${encodeURIComponent(privyId)}&limit=5`);
   if (!res.ok) throw new Error("Failed to fetch transactions");
   const data: TransactionsResponse = await res.json();
   return data.transactions;
@@ -78,20 +78,20 @@ export default function DashboardPage() {
     isLoading: balanceLoading,
     error: balanceError,
   } = useQuery<BalanceData>({
-    queryKey: ["balance"],
-    queryFn: fetchBalance,
+    queryKey: ["balance", user?.id],
+    queryFn: () => fetchBalance(user?.id!),
     refetchInterval: 30_000,
-    enabled: ready && authenticated,
+    enabled: ready && authenticated && !!user?.id,
   });
 
   const {
     data: transactions,
     isLoading: transactionsLoading,
   } = useQuery<Transaction[]>({
-    queryKey: ["recent-transactions"],
-    queryFn: fetchRecentTransactions,
+    queryKey: ["recent-transactions", user?.id],
+    queryFn: () => fetchRecentTransactions(user?.id!),
     refetchInterval: 30_000,
-    enabled: ready && authenticated,
+    enabled: ready && authenticated && !!user?.id,
   });
 
   // --------------------------------------------------------- Loading
