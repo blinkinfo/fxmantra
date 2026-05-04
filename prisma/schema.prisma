@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String        @id @default(cuid())
+  privyId       String        @unique
+  walletAddress String?
+  email         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  balance       Balance?
+  transactions  Transaction[]
+}
+
+model Balance {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  totalDeposited  Decimal  @default(0) @db.Decimal(18, 6)
+  totalWithdrawn  Decimal  @default(0) @db.Decimal(18, 6)
+  accruedProfit   Decimal  @default(0) @db.Decimal(18, 6)
+  withdrawnProfit Decimal  @default(0) @db.Decimal(18, 6)
+  lastAccrualDate DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Transaction {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // DEPOSIT, WITHDRAWAL, ACCRUAL
+  token     String   // USDC, USDT
+  amount    Decimal  @db.Decimal(18, 6)
+  txHash    String?
+  status    String   @default("PENDING") // PENDING, CONFIRMED, FAILED, PROCESSING, COMPLETED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
