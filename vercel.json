@@ -1,0 +1,11 @@
+{
+  "buildCommand": "prisma migrate deploy && next build",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "crons": [
+    {
+      "path": "/api/cron/accrue?secret=4b04ec234d92d8cee8b601f722d8ea72876c0d53a9b50529be2626a4178e42d3",
+      "schedule": "0 0 1 * *"
+    }
+  ]
+}
